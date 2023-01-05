@@ -1,4 +1,4 @@
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
 function get_players()
     local players = {}
@@ -64,8 +64,8 @@ minPlayersSlider.value = 3
 
 function update_script()
     local response_code, response_body, response_headers = web.get("https://raw.githubusercontent.com/ProtonDev-sys/Automatic-Crash-gta-v/main/automatic%20crash%20all.lua")
-    if response_code ~= 200 then 
-        menu.notify("Update failed.", "Automatic Crash All", 0xff0000, 2)
+    if enums.html_response_codes[response_code] ~= "OK" then 
+        menu.notify("Update failed.", "Automatic Crash All", 2, 0xff0000)
     else 
         local file = io.open(utils.get_appdata_path("PopstarDevs", "2Take1Menu").."\\".."scripts\\automatic crash all.lua", "w+b")
         file:write(response_body)
@@ -76,15 +76,15 @@ end
 
 menu.create_thread(function()
     if not menu.is_trusted_mode_enabled(8) then 
-        menu.notify("Trusted mode HTTP required for auto update!", "Automatic Crash All", 0xff0000, 2)
+        menu.notify("Trusted mode HTTP required for auto update!", "Automatic Crash All", 2, 0xff0000)
     else 
         local response_code, response_body, response_headers = web.get("https://raw.githubusercontent.com/ProtonDev-sys/Automatic-Crash-gta-v/main/version")
         if response_body:match( "^%s*(.-)%s*$" ) ~= VERSION:match( "^%s*(.-)%s*$" ) then 
-            menu.notify("Current version outdated, updating.", "Automatic Crash All", 0xff0000, 2)
+            menu.notify("Current version outdated, updating.", "Automatic Crash All", 2, 0xff0000)
             update_script()
         else
-            menu.notify("You are using the latest version, welcome.", "Automatic Crash All", 0xff00ff, 2)
+            menu.notify("You are using the latest version, welcome.", "Automatic Crash All", 2, 0xff00ff)
         end 
     end
-    menu.notify("Automatic crash all loaded version "..VERSION, "Automatic Crash All", 0xff00ff, 2)
+    menu.notify("Automatic crash all loaded version "..VERSION, "Automatic Crash All", 2, 0xff00ff)
 end)
