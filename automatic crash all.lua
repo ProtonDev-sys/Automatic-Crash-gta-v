@@ -1,4 +1,4 @@
-VERSION = "1.0.5"
+VERSION = "1.0.0"
 
 function get_players()
     local players = {}
