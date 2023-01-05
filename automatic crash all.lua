@@ -1,4 +1,4 @@
-VERSION = "1.0.0"
+VERSION = "1.0.5"
 
 function get_players()
     local players = {}
@@ -64,7 +64,7 @@ minPlayersSlider.value = 3
 
 function update_script()
     local response_code, response_body, response_headers = web.get("https://raw.githubusercontent.com/ProtonDev-sys/Automatic-Crash-gta-v/main/automatic%20crash%20all.lua")
-    if enums.html_response_codes[response_code] ~= "OK" then 
+    if response_code ~= 200 then 
         menu.notify("Update failed.", "Automatic Crash All", 0xff0000, 2)
     else 
         local file = io.open(utils.get_appdata_path("PopstarDevs", "2Take1Menu").."\\".."scripts\\automatic crash all.lua", "w+b")
