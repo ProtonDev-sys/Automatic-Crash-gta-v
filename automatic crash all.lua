@@ -1,4 +1,4 @@
-VERSION = "1.0.1"
+VERSION = "1.1.0"
 
 function get_players()
     local players = {}
@@ -10,33 +10,69 @@ function get_players()
     return players
 end
 
+function SessionType()
+    if network.is_session_started() then
+        if native.call(0xF3929C2379B60CCE):__tointeger() == 1 then 
+            return "Solo"
+        elseif native.call(0xCEF70AA5B3F89BA1):__tointeger() == 1 then
+            return "Invite Only"
+        elseif native.call(0xFBCFA2EA2E206890):__tointeger() == 1 then
+            return "Friends Only"
+        elseif native.call(0x74732C6CA90DA2B4):__tointeger() == 1 then 
+            return "Crew Only"
+        end
+        return "Public"
+    end
+    return "Singleplayer"
+
+end
+
 function crashSession(feat)
+    local playerAmount = nil
+    local joined = false
     while feat.on do
         local players = get_players()
-        if #players <= minPlayersSlider.value then 
+        if #players <= minPlayersSlider.value and not joined and script.get_global_i(1574993) == 66 or SessionType() == "Singleplayer" then 
+            system.wait(1000)
+            --menu.get_feature_by_hierarchy_key("online.lobby.bail_netsplit"):toggle()
+            --[[for _,v in next, menu.get_feature_by_hierarchy_key("online.session_browser").children do 
+                if _ == 1 then 
+                    v:toggle()
+                    menu.notify(v.name)
+                elseif _ == 7 then 
+                    v:toggle()
+                    menu.notify(v.name)
+                    system.wait(30000)
+                    break
+                end
+            end]]
+            menu.clear_all_notifications()
+            menu.notify("Session hopping")
+            system.wait(250)
             network.join_new_lobby(0)
-        else 
+            joined = true
+        end
+        if #players > 1 and player.player_id() ~= 0 then 
             network.send_chat_message(spamMessage, false)
             menu.get_feature_by_hierarchy_key("online.all_players.crash_all"):toggle()
+            joined = false
         end
         system.wait(100)
     end
 end
 
-function modify_spam_text(feat,bool)
+function modify_spam_text(feat)
     local code,message = input.get("Message to Spam", "", 256, 0)
-    while input.is_open() do 
+    while true do 
+        code,message = input.get("Message to Spam", "", 256, 0)
+        if code == 0 then break end
         system.wait(10)   
     end
-    if not bool then
-        modify_spam_text(feat,true)
+    if code == 0 then 
+        menu.notify(message,"Spam Message Changed to",3)
+        spamMessage = message
     else 
-        if code == 0 then 
-            menu.notify(message,"Spam Message Changed to",3)
-            spamMessage = message
-        else 
-            menu.notify("Message Cancelled", "Automatic Server Crasher")
-        end
+        menu.notify("Message Cancelled", "Automatic Server Crasher")
     end
 end
 
@@ -44,7 +80,7 @@ function get_spam_text(feat)
     menu.notify(spamMessage,"Spam message",3)
 end
 
-spamMessage = "Get crashed by Proton you fat coons."
+spamMessage = "Get crashed by Proton#4469 with a lua."
 
 local local_parent = menu.add_feature("Automatic Session Crasher", "parent", 0)
 
@@ -77,6 +113,7 @@ menu.create_thread(function()
     if not menu.is_trusted_mode_enabled(8) then 
         menu.notify("Trusted mode HTTP required for auto update!", "Automatic Crash All", 2, 0xff0000ff)
     else 
+        if VERSION == "DEV" then return end
         local response_code, response_body, response_headers = web.get("https://raw.githubusercontent.com/ProtonDev-sys/Automatic-Crash-gta-v/main/version")
         if response_body:match( "^%s*(.-)%s*$" ) ~= VERSION:match( "^%s*(.-)%s*$" ) then 
             menu.notify("Current version outdated, updating.", "Automatic Crash All", 2, 0xff0000ff)
